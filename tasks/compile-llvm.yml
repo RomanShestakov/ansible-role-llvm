@@ -1,14 +1,16 @@
+---
 # file: ansible-role-llvm/tasks/source.yml
 
-- name: LLVM | clean tmp dir
-  file:
-    state: absent
-    path: "{{ llvm_tmp }}"
+# - name: LLVM | clean tmp dir
+#   file:
+#     state: absent
+#     path: "{{ llvm_tmp }}"
 
-- name: LLVM | clean build dir
-  file:
-    state: absent
-    path: "{{ llvm_build_dir }}"
+# - name: LLVM | clean build dir
+#   file:
+#     state: absent
+#     path: "{{ llvm_build_dir }}"
+
 
 - name: LLVM | get from git repository
   git: repo="{{ llvm_repo_url }}"
@@ -21,7 +23,7 @@
   file: path="{{ llvm_build_dir }}" state=directory
   when: llvm_downloaded.changed
 
-- name: LLVM | run cmake
+- name: LLVM | run cmake x86
   command:  chdir="{{ llvm_build_dir }}" \
             cmake -G "Unix Makefiles" {{ llvm_tmp }} \
             -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt" \
@@ -32,34 +34,58 @@
             -DCMAKE_INSTALL_PREFIX={{llvm_install_dir}} \
             -DLLVM_ENABLE_ASSERTIONS=ON \
             -DCMAKE_BUILD_TYPE="Release" \
+            -DLLVM_TARGETS_TO_BUILD="X86" \
             {{ llvm_tmp }}/llvm
   when: llvm_downloaded.changed
+  when: ansible_architecture == "x86_64"
+  register: llvm_cmake
+
+- name: LLVM | run cmake aarch64
+  command:  chdir="{{ llvm_build_dir }}" \
+            cmake -G "Unix Makefiles" {{ llvm_tmp }} \
+            -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt" \
+            -DCMAKE_C_COMPILER={{gcc_install_dir}}/bin/gcc \
+            -DCMAKE_CXX_COMPILER={{gcc_install_dir}}/bin/g++ \
+            -DGCC_INSTALL_PREFIX={{gcc_install_dir}} \
+            -DCMAKE_CXX_LINK_FLAGS="-L{{gcc_install_dir}}/lib64 -Wl,-rpath,{{gcc_install_dir}}/lib64" \
+            -DCMAKE_INSTALL_PREFIX={{llvm_install_dir}} \
+            -DLLVM_ENABLE_ASSERTIONS=ON \
+            -DCMAKE_BUILD_TYPE="Release" \
+            -DLLVM_TARGETS_TO_BUILD="AArch64" \
+            {{ llvm_tmp }}/llvm
+  when: llvm_downloaded.changed
+  when: ansible_architecture == "arm64"
+  register: llvm_cmake
 
 - name: LLVM | make
   become: true
   command: chdir="{{ llvm_build_dir }}" make -j 3
-  when: llvm_downloaded.changed
+  when: llvm_cmake.changed
+  register: llvm_make
 
 - name: LLVM | install
   become: true
   command: chdir="{{ llvm_build_dir }}" make install
-  when: llvm_downloaded.changed
+  when: llvm_make.changed
+  register: llvm_install
 
 - name: LLVM | add path to /etc/ld.so.conf.d/
   become: true
   action: template src=llvm.conf-template.j2
           dest="/etc/ld.so.conf.d/llvm-{{version}}.conf"
           mode=0644
-  when: llvm_downloaded.changed
+  when: llvm_install.changed
 
 - name: LLVM | run ldconfig
   become: true
   shell: ldconfig
-  when: llvm_downloaded.changed
+  when: llvm_install.changed
 
 - name: LLVM | add path to /etc/profile.d
   become: true
   action: template src=llvm.sh-template.j2
           dest="/etc/profile.d/llvm.sh"
           mode=0644
-  when: llvm_downloaded.changed
+  when: llvm_install.changed
+
+...
