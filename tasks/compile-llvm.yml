@@ -23,6 +23,10 @@
   file: path="{{ llvm_build_dir }}" state=directory
   when: llvm_downloaded.changed
 
+- name: LLVM | wat
+  debug:
+    msg: "ansible_architecture.stdout: {{ ansible_architecture }}"
+
 - name: LLVM | run cmake x86
   command:  chdir="{{ llvm_build_dir }}" \
             cmake -G "Unix Makefiles" {{ llvm_tmp }} \
@@ -54,7 +58,7 @@
             -DLLVM_TARGETS_TO_BUILD="AArch64" \
             {{ llvm_tmp }}/llvm
   when: llvm_downloaded.changed
-  when: ansible_architecture == "arm64"
+  when: ansible_architecture == "aarch64"
   register: llvm_cmake
 
 - name: LLVM | make
