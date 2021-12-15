@@ -69,7 +69,7 @@
 
 - name: LLVM | make
   become: true
-  command: chdir="{{ llvm_build_dir }}" make -j 3
+  command: chdir="{{ llvm_build_dir }}" make -j 1
   when: llvm_cmake.changed
   register: llvm_make
 
