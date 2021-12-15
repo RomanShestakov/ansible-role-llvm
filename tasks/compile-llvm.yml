@@ -12,10 +12,16 @@
 #     path: "{{ llvm_build_dir }}"
 
 
+- name: LLVM | check if source archive exists
+  command: /usr/bin/test -e {{llvm_tmp}}
+  ignore_errors: True
+  register: llvm_arch_exists
+
 - name: LLVM | get from git repository
   git: repo="{{ llvm_repo_url }}"
        dest="{{ llvm_tmp }}"
        version="{{ version }}"
+  when: llvm_arch_exists.rc != 0
   register: llvm_downloaded
 
 - name: LLVM | Make LLVM build folder
