@@ -14,7 +14,7 @@
 
 - name: LLVM | check if source archive exists
   stat:
-    path: {{llvm_tmp}}
+    path: "{{ llvm_tmp }}"
   register: llvm_arch_exists
 
 - name: LLVM | get from git repository
