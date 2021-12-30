@@ -102,12 +102,14 @@
   become: true
   file:
     path: "{{ llvm_build_dir }}"
+    state: absent
   when: llvm_install.changed
 
 - name: LLVM | cleanup tmp
   become: true
   file:
     path: "{{ llvm_tmp }}"
+    state: absent
   when: llvm_install.changed
 
 ...
