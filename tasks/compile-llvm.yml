@@ -12,16 +12,16 @@
 #     path: "{{ llvm_build_dir }}"
 
 
-- name: LLVM | check if source archive exists
+- name: LLVM | check if LLVM is already installed
   stat:
     path: "{{ llvm_install_dir }}"
-  register: llvm_arch_exists
+  register: llvm_exists
 
 - name: LLVM | get from git repository
   git: repo="{{ llvm_repo_url }}"
        dest="{{ llvm_tmp }}"
        version="{{ version }}"
-  when: not llvm_arch_exists.stat.exists
+  when: not llvm_exists.stat.exists
   register: llvm_downloaded
 
 - name: LLVM | Make LLVM build folder
@@ -46,8 +46,9 @@
             -DCMAKE_BUILD_TYPE="Release" \
             -DLLVM_TARGETS_TO_BUILD="X86" \
             {{ llvm_tmp }}/llvm
-  when: llvm_downloaded.changed
-  when: ansible_architecture == "x86_64"
+  when:
+    - llvm_downloaded.changed
+    - ansible_architecture == "x86_64"
   register: llvm_cmake
 
 - name: LLVM | run cmake aarch64
@@ -63,8 +64,9 @@
             -DCMAKE_BUILD_TYPE="Release" \
             -DLLVM_TARGETS_TO_BUILD="AArch64" \
             {{ llvm_tmp }}/llvm
-  when: llvm_downloaded.changed
-  when: ansible_architecture == "aarch64"
+  when:
+    - llvm_downloaded.changed
+    - ansible_architecture == "aarch64"
   register: llvm_cmake
 
 - name: LLVM | make
