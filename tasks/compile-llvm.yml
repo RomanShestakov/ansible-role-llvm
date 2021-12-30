@@ -14,14 +14,14 @@
 
 - name: LLVM | check if source archive exists
   stat:
-    path: "{{ llvm_tmp }}"
+    path: "{{ llvm_install_dir }}"
   register: llvm_arch_exists
 
 - name: LLVM | get from git repository
   git: repo="{{ llvm_repo_url }}"
        dest="{{ llvm_tmp }}"
        version="{{ version }}"
-  when: llvm_arch_exists.stat.exists
+  when: not llvm_arch_exists.stat.exists
   register: llvm_downloaded
 
 - name: LLVM | Make LLVM build folder
@@ -96,6 +96,18 @@
   action: template src=llvm.sh-template.j2
           dest="/etc/profile.d/llvm.sh"
           mode=0644
+  when: llvm_install.changed
+
+- name: LLVM | cleanup build
+  become: true
+  file:
+    path: "{{ llvm_build_dir }}"
+  when: llvm_install.changed
+
+- name: LLVM | cleanup tmp
+  become: true
+  file:
+    path: "{{ llvm_tmp }}"
   when: llvm_install.changed
 
 ...
