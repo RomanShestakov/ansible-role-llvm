@@ -17,11 +17,11 @@
 #   register: llvm_exists
 
 - name: LLVM | check if LLVM is already installed
-  shell: command -v llvm-configrvm >/dev/null 2>&1
+  shell: command -v llvm-config >/dev/null 2>&1
   register: llvm_exists
   ignore_errors: yes
 
-- debug: msg="{{ llvm_exist.rc }}" # it returns rc 1
+- debug: msg="{{ llvm_exists.rc }}" # it returns rc 1
 - debug: var=llvm_exists
 
 - name: LLVM | get from git repository
