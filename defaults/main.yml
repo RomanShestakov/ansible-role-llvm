@@ -5,4 +5,4 @@ version: "llvmorg-12-init"
 llvm_repo_url: https://github.com/llvm/llvm-project.git
 llvm_tmp: "/tmp/llvm"
 llvm_build_dir: /tmp/llvm-{{version}}-build
-llvm_install_dir: /opt/llvm-{{version}}
+llvm_install_dir: /usr/local

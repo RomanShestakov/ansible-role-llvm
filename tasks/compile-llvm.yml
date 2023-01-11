@@ -37,11 +37,6 @@
   command:  chdir="{{ llvm_build_dir }}" \
             cmake -G "Unix Makefiles" {{ llvm_tmp }} \
             -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt" \
-            -DCMAKE_C_COMPILER={{gcc_install_dir}}/bin/gcc \
-            -DCMAKE_CXX_COMPILER={{gcc_install_dir}}/bin/g++ \
-            -DPYTHON3_EXECUTABLE={{python_path}}/bin/python \
-            -DGCC_INSTALL_PREFIX={{gcc_install_dir}} \
-            -DCMAKE_CXX_LINK_FLAGS="-L{{gcc_install_dir}}/lib64 -Wl,-rpath,{{gcc_install_dir}}/lib64" \
             -DCMAKE_INSTALL_PREFIX={{llvm_install_dir}} \
             -DLLVM_ENABLE_ASSERTIONS=ON \
             -DCMAKE_BUILD_TYPE="Release" \
@@ -56,10 +51,6 @@
   command:  chdir="{{ llvm_build_dir }}" \
             cmake -G "Unix Makefiles" {{ llvm_tmp }} \
             -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt" \
-            -DCMAKE_C_COMPILER={{gcc_install_dir}}/bin/gcc \
-            -DCMAKE_CXX_COMPILER={{gcc_install_dir}}/bin/g++ \
-            -DGCC_INSTALL_PREFIX={{gcc_install_dir}} \
-            -DCMAKE_CXX_LINK_FLAGS="-L{{gcc_install_dir}}/lib64 -Wl,-rpath,{{gcc_install_dir}}/lib64" \
             -DCMAKE_INSTALL_PREFIX={{llvm_install_dir}} \
             -DLLVM_ENABLE_ASSERTIONS=ON \
             -DCMAKE_BUILD_TYPE="Release" \
