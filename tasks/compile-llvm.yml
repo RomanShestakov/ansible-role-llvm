@@ -13,15 +13,14 @@
 
 
 - name: LLVM | check if LLVM is already installed
-  stat:
-    path: "{{ llvm_install_dir }}"
+  ansible.builtin.command: llvm-config --version
   register: llvm_exists
 
 - name: LLVM | get from git repository
   git: repo="{{ llvm_repo_url }}"
        dest="{{ llvm_tmp }}"
        version="{{ version }}"
-  when: not llvm_exists.stat.exists
+  when: not llvm_exists.rc == 0
   register: llvm_downloaded
 
 - name: LLVM | Make LLVM build folder
