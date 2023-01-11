@@ -12,9 +12,17 @@
 #     path: "{{ llvm_build_dir }}"
 
 
+# - name: LLVM | check if LLVM is already installed
+#   ansible.builtin.command: llvm-config --version
+#   register: llvm_exists
+
 - name: LLVM | check if LLVM is already installed
-  ansible.builtin.command: llvm-config --version
+  shell: command -v llvm-configrvm >/dev/null 2>&1
   register: llvm_exists
+  ignore_errors: yes
+
+- debug: msg="{{ llvm_exist.rc }}" # it returns rc 1
+- debug: var=llvm_exists
 
 - name: LLVM | get from git repository
   git: repo="{{ llvm_repo_url }}"
