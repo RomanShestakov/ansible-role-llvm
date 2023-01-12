@@ -68,6 +68,10 @@
     - ansible_architecture == "aarch64"
   register: llvm_cmake
 
+- name: LLVM | wat llvm_cmake
+  debug:
+    msg: "llvm_cmake: {{ llvm_cmake }}"
+
 - name: LLVM | make
   become: true
   command: chdir="{{ llvm_build_dir }}" make -j{{llvm_number_build_jobs}}
