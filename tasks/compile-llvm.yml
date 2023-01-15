@@ -31,6 +31,13 @@
   when: not llvm_exists.rc == 0
   register: llvm_downloaded
 
+# https://reviews.llvm.org/D89450
+- name: LLVM | apply patch
+  ansible.posix.patch:
+    remote_src=no
+    src=limits.patch
+  when: llvm_downloaded.changed and "{{ version }}" == "llvmorg-12-init"
+
 - name: LLVM | Make LLVM build folder
   become: true
   file: path="{{ llvm_build_dir }}" state=directory
