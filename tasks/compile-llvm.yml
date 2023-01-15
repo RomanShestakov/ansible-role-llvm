@@ -38,7 +38,7 @@
   ansible.posix.patch:
     remote_src=no
     src=limits.patch
-    basedir="{{ llvm_tmp }}/llvm-project-{{version}}"
+    dest="{{ llvm_tmp }}/llvm-project-{{version}}/libcxx/utils/google-benchmark/src/benchmark_register.h"
   when: llvm_downloaded.changed and version == "llvmorg-12.0.1"
 
 - name: LLVM | Make LLVM build folder
