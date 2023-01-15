@@ -24,19 +24,28 @@
 - debug: msg="{{ llvm_exists.rc }}" # it returns rc 1
 - debug: var=llvm_exists
 
-- name: LLVM | get from git repository
-  git: repo="{{ llvm_repo_url }}"
-       dest="{{ llvm_tmp }}"
-       version="{{ version }}"
-  when: not llvm_exists.rc == 0
-  register: llvm_downloaded
+# - name: LLVM | get from git repository
+#   git: repo="{{ llvm_repo_url }}"
+#        dest="{{ llvm_tmp }}"
+#        version="{{ version }}"
+#   when: not llvm_exists.rc == 0
+#   register: llvm_downloaded
+
+- name: LLVM | get from ftp
+  ansible.builtin.unarchive:
+    src: "{{ llvm_repo_url }}/{{ version }}.zip"
+    dest: "{{ llvm_tmp }}"
+    remote_src: yes
+  when: not boost_exists.stat.exists
+  register: boost_downloaded
+
 
 # https://reviews.llvm.org/D89450
 - name: LLVM | apply patch
   ansible.posix.patch:
     remote_src=no
     src=limits.patch
-  when: llvm_downloaded.changed and version == "llvmorg-12-init"
+  when: llvm_downloaded.changed and version == "llvmorg-12.0.1"
 
 - name: LLVM | Make LLVM build folder
   become: true
@@ -56,7 +65,7 @@
             -DLLVM_ENABLE_RTTI=ON \
             -DCMAKE_BUILD_TYPE="Release" \
             -DLLVM_TARGETS_TO_BUILD="X86" \
-            {{ llvm_tmp }}/llvm
+            "{{ llvm_tmp }}/llvm-project-{{version}}"
   when:
     - llvm_downloaded.changed
     - ansible_architecture == "x86_64"
@@ -71,7 +80,7 @@
             -DLLVM_ENABLE_RTTI=ON \
             -DCMAKE_BUILD_TYPE="Release" \
             -DLLVM_TARGETS_TO_BUILD="AArch64" \
-            {{ llvm_tmp }}/llvm
+            "{{ llvm_tmp }}/llvm-project-{{version}}"
   when:
     - llvm_downloaded.changed
     - ansible_architecture == "aarch64"
@@ -122,7 +131,7 @@
 - name: LLVM | cleanup tmp
   become: true
   file:
-    path: "{{ llvm_tmp }}"
+    path: "{{ llvm_tmp }}/llvm-project-{{version}}"
     state: absent
   when: llvm_install.changed
 

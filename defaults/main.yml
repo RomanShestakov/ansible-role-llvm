@@ -1,8 +1,8 @@
 # file: ansible-role-llvm/defaults/main.yml
 
 llvm_number_build_jobs: 1
-version: "llvmorg-12-init"
-llvm_repo_url: https://github.com/llvm/llvm-project.git
+version: "llvmorg-12.0.1"
+llvm_repo_url: https://github.com/llvm/llvm-project/archive/refs/tags/
 llvm_tmp: "/scratch/llvm"
 llvm_build_dir: /scratch/llvm-{{version}}-build
 llvm_install_dir: /usr/local
