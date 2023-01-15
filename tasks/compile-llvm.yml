@@ -24,20 +24,13 @@
 - debug: msg="{{ llvm_exists.rc }}" # it returns rc 1
 - debug: var=llvm_exists
 
-# - name: LLVM | get from git repository
-#   git: repo="{{ llvm_repo_url }}"
-#        dest="{{ llvm_tmp }}"
-#        version="{{ version }}"
-#   when: not llvm_exists.rc == 0
-#   register: llvm_downloaded
-
 - name: LLVM | get from ftp
   ansible.builtin.unarchive:
     src: "{{ llvm_repo_url }}/{{ version }}.zip"
     dest: "{{ llvm_tmp }}"
     remote_src: yes
-  when: not boost_exists.stat.exists
-  register: boost_downloaded
+  when: not llvm_exists.rc == 0
+  register: llvm_downloaded
 
 
 # https://reviews.llvm.org/D89450
