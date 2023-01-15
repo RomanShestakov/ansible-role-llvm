@@ -36,7 +36,7 @@
   ansible.posix.patch:
     remote_src=no
     src=limits.patch
-  when: llvm_downloaded.changed and "{{ version }}" == "llvmorg-12-init"
+  when: llvm_downloaded.changed and version == "llvmorg-12-init"
 
 - name: LLVM | Make LLVM build folder
   become: true
