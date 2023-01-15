@@ -33,13 +33,13 @@
   register: llvm_downloaded
 
 
-# https://reviews.llvm.org/D89450
-- name: LLVM | apply patch
-  ansible.posix.patch:
-    remote_src=no
-    src=limits.patch
-    dest="{{ llvm_tmp }}/llvm-project-{{version}}/libcxx/utils/google-benchmark/src/benchmark_register.h"
-  when: llvm_downloaded.changed and version == "llvmorg-12.0.1"
+# # https://reviews.llvm.org/D89450
+# - name: LLVM | apply patch
+#   ansible.posix.patch:
+#     remote_src=no
+#     src=limits.patch
+#     dest="{{ llvm_tmp }}/llvm-project-{{version}}/libcxx/utils/google-benchmark/src/benchmark_register.h"
+#   when: llvm_downloaded.changed and version == "llvmorg-12.0.1"
 
 - name: LLVM | Make LLVM build folder
   become: true
@@ -59,7 +59,7 @@
             -DLLVM_ENABLE_RTTI=ON \
             -DCMAKE_BUILD_TYPE="Release" \
             -DLLVM_TARGETS_TO_BUILD="X86" \
-            "{{ llvm_tmp }}/llvm-project-{{version}}"
+            "{{ llvm_tmp }}/llvm-project-{{version}}/llvm"
   when:
     - llvm_downloaded.changed
     - ansible_architecture == "x86_64"
@@ -74,7 +74,7 @@
             -DLLVM_ENABLE_RTTI=ON \
             -DCMAKE_BUILD_TYPE="Release" \
             -DLLVM_TARGETS_TO_BUILD="AArch64" \
-            "{{ llvm_tmp }}/llvm-project-{{version}}"
+            "{{ llvm_tmp }}/llvm-project-{{version}}/llvm"
   when:
     - llvm_downloaded.changed
     - ansible_architecture == "aarch64"
